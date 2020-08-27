@@ -61,6 +61,25 @@ function collide(arena, player) {
     return false;
 }
 
+function rotate(m, d) {
+    for (let y = 0; y < m.length; ++y) {
+        for (let x = 0; x < y; ++x) {
+            [
+                m[x][y],
+                m[y][x],
+            ] = [
+                m[y][x],
+                m[x][y],
+            ];
+        }
+    }
+    if (d > 0) {
+        m.forEach(r => r.reverse());
+    } else {
+        m.reverse();
+    }
+}
+
 //the merge function.
 
 function merge(arena, player) {
