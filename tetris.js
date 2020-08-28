@@ -3,11 +3,6 @@ const cxs = cvs.getContext('2d');
 
 cxs.scale(20, 20);
 
-const matrix = [
-    [0, 0, 0],
-    [1, 1, 1],
-    [0, 1, 0],
-];
 
 //create a matrix.
 function createMatrix(w, h) {
@@ -35,11 +30,57 @@ function drawMatrix(matrix, s) {
     matrix.forEach((row, y) => {
         row.forEach((v, x) => {
             if (v !== 0) {
-                cxs.fillStyle = 'red';
+                cxs.fillStyle = color[v];
                 cxs.fillRect(x + s.x, y + s.y, 1, 1);
             }
         });
     });
+}
+
+function playerpiece(p) {
+    if (p === 'T') {
+        return [
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 1, 0],
+        ];
+    }else if (p === 'O') {
+        return [
+            [2, 2],
+            [2, 2],
+        ];
+    }else if (p === 'L') {
+        return [
+            [0, 3, 0],
+            [0, 3, 0],
+            [0, 3, 3],
+        ];
+    }else if (p === 'J') {
+        return [
+            [0, 4, 0],
+            [0, 4, 0],
+            [4, 4, 0],
+        ];
+    }else if (p === 'I') {
+        return [
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+            [0, 5, 0, 0],
+        ];
+    }else if (p === 'S') {
+        return [
+            [0, 6, 6],
+            [6, 6, 0],
+            [0, 0, 0],
+        ];
+    }else if (p === 'Z') {
+        return [
+            [7, 7, 0],
+            [0, 7, 7],
+            [0, 0, 0],
+        ];
+    }
 }
 
 function playerMove(d) {
@@ -47,7 +88,7 @@ function playerMove(d) {
     if (collide(arena, player)) {
         player.pos.x -= d;
     }
-}
+    }
 
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
@@ -61,6 +102,34 @@ function collide(arena, player) {
     return false;
 }
 
+
+
+const color = [
+    null,
+    '#B7FE63',
+    '#FE7E63',
+    '#FEE963',
+    '#63FECD',
+    '#FEBE63',
+    '#5EFF4D',
+    '#FFA315',
+] 
+
+function playerRoate(d) {
+    const ps = player.pos.x;
+    let set = 1;
+    rotate(player.matrix, d);
+    while (collide(arena, player)) {
+        player.pos.x += set;
+        set = -(set + (set > 0 ? 1 : -1));
+        if (set > player.matrix[0].length) {
+            rotate(player.matrix, -d);
+            player.pos.x = ps;
+            return;
+        }
+    }
+}
+  
 function rotate(m, d) {
     for (let y = 0; y < m.length; ++y) {
         for (let x = 0; x < y; ++x) {
@@ -112,12 +181,24 @@ function update(t = 0) {
     requestAnimationFrame(update);
 }
 
+function Reset() {
+    const p = 'OTSLZIL';
+    player.matrix = playerpiece(p[p.length * Math.random() | 0]);
+    player.pos.y = 0;
+    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+
+    if (collide(arena, player)) {
+        arena.forEach(r => r.fill(0));
+    }
+}
+
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
         player.pos.y--;
         merge(arena, player);
-        player.pos.y = 0;
+        Reset();
+        //player.pos.y = 0;
     }
     drpcnt = 0; 
 }
@@ -129,15 +210,19 @@ document.addEventListener('keydown', event => {
         playerMove(-1);
     }else if (event.keyCode === 39) {
         playerMove(1);
-    } else if (event.keyCode === 40) {
+    }else if (event.keyCode === 40) {
         playerDrop();
+    }else if (event.keyCode === 65) {
+        playerRoate(-1);
+    }else if (event.keyCode === 68) {
+        playerRoate(1);
     }
     console.log(event);
 });
 
 const player = {
     pos: {x: 5, y: 5},
-    matrix: matrix,
+    matrix: playerpiece('T'),
 }
  
 update(); 
