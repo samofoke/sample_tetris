@@ -102,6 +102,22 @@ function collide(arena, player) {
     return false;
 }
 
+function distroyPiece() {
+    let cnt = 1;
+    outer: for (let y = arena.length - 1; y > 0; --y) {
+        for (let x = 0; x < arena[y].length; ++x) {
+            if (arena[y][x] === 0) {
+                continue outer;
+            }
+        }
+        const r = arena.splice(y, 1)[0].fill(0);
+        arena.unshift(r);
+        ++y;
+
+        player.score += cnt * 10;
+        cnt *= 2;
+    }
+}
 
 
 const color = [
@@ -189,7 +205,13 @@ function Reset() {
 
     if (collide(arena, player)) {
         arena.forEach(r => r.fill(0));
+        player.score = 0;
+        updateScore();
     }
+}
+
+function updateScore() {
+    document.getElementById('score').innerText = player.score;
 }
 
 function playerDrop() {
@@ -198,6 +220,8 @@ function playerDrop() {
         player.pos.y--;
         merge(arena, player);
         Reset();
+        distroyPiece();
+        updateScore();
         //player.pos.y = 0;
     }
     drpcnt = 0; 
@@ -217,12 +241,14 @@ document.addEventListener('keydown', event => {
     }else if (event.keyCode === 68) {
         playerRoate(1);
     }
-    console.log(event);
+    //console.log(event);
 });
 
 const player = {
-    pos: {x: 5, y: 5},
-    matrix: playerpiece('T'),
+    pos: {x: 0, y: 0},
+    matrix: null,
+    score: 0,
 }
- 
+ Reset();
+ updateScore();
 update(); 
