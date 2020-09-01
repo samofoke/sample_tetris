@@ -1,5 +1,6 @@
 const cvs = document.getElementById('tetris');
 const cxs = cvs.getContext('2d');
+const player = new Player;
 
 cxs.scale(20, 20);
 
@@ -83,12 +84,6 @@ function playerpiece(p) {
     }
 }
 
-function playerMove(d) {
-    player.pos.x += d;
-    if (collide(arena, player)) {
-        player.pos.x -= d;
-    }
-    }
 
 function collide(arena, player) {
     const [m, o] = [player.matrix, player.pos];
@@ -130,21 +125,6 @@ const color = [
     '#5EFF4D',
     '#FFA315',
 ] 
-
-function playerRoate(d) {
-    const ps = player.pos.x;
-    let set = 1;
-    rotate(player.matrix, d);
-    while (collide(arena, player)) {
-        player.pos.x += set;
-        set = -(set + (set > 0 ? 1 : -1));
-        if (set > player.matrix[0].length) {
-            rotate(player.matrix, -d);
-            player.pos.x = ps;
-            return;
-        }
-    }
-}
   
 function rotate(m, d) {
     for (let y = 0; y < m.length; ++y) {
@@ -179,8 +159,7 @@ function merge(arena, player) {
 
 //this update the frames of draw.
 
-let drpcnt = 0;
-let drpint = 1000;
+
 
 let last = 0;
 
@@ -188,10 +167,7 @@ function update(t = 0) {
     const d = t - last;
     last = t;
     
-    drpcnt += d;
-    if (drpcnt > drpint) {
-        playerDrop();
-    }
+    player.update(d);
     //console.log(d);
     draw();
     requestAnimationFrame(update);
@@ -214,41 +190,24 @@ function updateScore() {
     document.getElementById('score').innerText = player.score;
 }
 
-function playerDrop() {
-    player.pos.y++;
-    if (collide(arena, player)) {
-        player.pos.y--;
-        merge(arena, player);
-        Reset();
-        distroyPiece();
-        updateScore();
-        //player.pos.y = 0;
-    }
-    drpcnt = 0; 
-}
 const arena = createMatrix(12, 20);
 
 
 document.addEventListener('keydown', event => {
     if (event.keyCode === 37) {
-        playerMove(-1);
+        player.move(-1);
     }else if (event.keyCode === 39) {
-        playerMove(1);
+        player.move(1);
     }else if (event.keyCode === 40) {
-        playerDrop();
+        player.drop();
     }else if (event.keyCode === 65) {
-        playerRoate(-1);
+        player.rotate(-1);
     }else if (event.keyCode === 68) {
-        playerRoate(1);
+        player.rotate(1);
     }
     //console.log(event);
 });
 
-const player = {
-    pos: {x: 0, y: 0},
-    matrix: null,
-    score: 0,
-}
  Reset();
  updateScore();
 update(); 
