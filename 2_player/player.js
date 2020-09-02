@@ -8,6 +8,18 @@ class Player {
         this.matrix = null;
         this.score = 0;
     }
+    reset() {
+        const p = 'OTJSLZIL';
+        this.matrix = playerpiece(p[p.length * Math.random() | 0]);
+        this.pos.y = 0;
+        this.pos.x = (arena[0].length / 2 | 0) - (this.matrix[0].length / 2 | 0);
+    
+        if (collide(arena, this)) {
+            arena.forEach(r => r.fill(0));
+            this.score = 0;
+            updateScore();
+        }
+    }
     update(d) {
         this.drpcnt += d;
         if (this.drpcnt > this.drpint) {
@@ -39,7 +51,7 @@ class Player {
         if (collide(arena, this)) {
             this.pos.y--;
             merge(arena, this);
-            Reset();
+            this.reset();
             distroyPiece();
             updateScore();
             //player.pos.y = 0;

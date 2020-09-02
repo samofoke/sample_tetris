@@ -173,19 +173,6 @@ function update(t = 0) {
     requestAnimationFrame(update);
 }
 
-function Reset() {
-    const p = 'OTJSLZIL';
-    player.matrix = playerpiece(p[p.length * Math.random() | 0]);
-    player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-
-    if (collide(arena, player)) {
-        arena.forEach(r => r.fill(0));
-        player.score = 0;
-        updateScore();
-    }
-}
-
 function updateScore() {
     document.getElementById('score').innerText = player.score;
 }
@@ -208,6 +195,6 @@ document.addEventListener('keydown', event => {
     //console.log(event);
 });
 
- Reset();
+ player.reset();
  updateScore();
 update(); 
