@@ -12,10 +12,10 @@ class Player {
         const p = 'OTJSLZIL';
         this.matrix = playerpiece(p[p.length * Math.random() | 0]);
         this.pos.y = 0;
-        this.pos.x = (arena[0].length / 2 | 0) - (this.matrix[0].length / 2 | 0);
+        this.pos.x = (arena.matrix[0].length / 2 | 0) - (this.matrix[0].length / 2 | 0);
     
         if (collide(arena, this)) {
-            arena.forEach(r => r.fill(0));
+            arena.clear();
             this.score = 0;
             updateScore();
         }
@@ -28,31 +28,49 @@ class Player {
     }
     move(d) {
         this.pos.x += d;
-        if (collide(arena, this)) {
+        if (arena.collide(this)) {
             this.pos.x -= d;
         }
     }
     rotate(d) {
         const ps = this.pos.x;
         let set = 1;
-        rotate(this.matrix, d);
-        while (collide(arena, this)) {
+        this.rotate_matrix(this.matrix, d);
+        while (arena.collide(this)) {
             this.pos.x += set;
             set = -(set + (set > 0 ? 1 : -1));
             if (set > this.matrix[0].length) {
-                rotate(this.matrix, -d);
+                this.rotate_matrix(this.matrix, -d);
                 this.pos.x = ps;
                 return;
             }
         }
     }
+    rotate_matrix(m, d) {
+        for (let y = 0; y < m.length; ++y) {
+            for (let x = 0; x < y; ++x) {
+                [
+                    m[x][y],
+                    m[y][x],
+                ] = [
+                    m[y][x],
+                    m[x][y],
+                ];
+            }
+        }
+        if (d > 0) {
+            m.forEach(r => r.reverse());
+        } else {
+            m.reverse();
+        }
+    }
     drop() {
         this.pos.y++;
-        if (collide(arena, this)) {
+        if (arena.collide(this)) {
             this.pos.y--;
-            merge(arena, this);
+            arena.merge(this);
             this.reset();
-            distroyPiece();
+            arena.distroyPiece();
             updateScore();
             //player.pos.y = 0;
         }

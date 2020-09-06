@@ -6,13 +6,7 @@ cxs.scale(20, 20);
 
 
 //create a matrix.
-function createMatrix(w, h) {
-    const matrix = [];
-    while (h--) {
-        matrix.push(new Array(w).fill(0));
-    }
-    return matrix;
-}
+
 
 //the draw function.
 
@@ -21,7 +15,7 @@ function draw() {
     cxs.fillStyle = '#000';
     cxs.fillRect(0, 0, cvs.width, cvs.height);
 
-    drawMatrix(arena, {x: 0, y: 0});
+    drawMatrix(arena.matrix, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
 }
 
@@ -85,34 +79,6 @@ function playerpiece(p) {
 }
 
 
-function collide(arena, player) {
-    const [m, o] = [player.matrix, player.pos];
-    for (let y = 0; y < m.length; ++y) {
-        for (let x = 0; x < m[y].length; ++x) {
-            if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-function distroyPiece() {
-    let cnt = 1;
-    outer: for (let y = arena.length - 1; y > 0; --y) {
-        for (let x = 0; x < arena[y].length; ++x) {
-            if (arena[y][x] === 0) {
-                continue outer;
-            }
-        }
-        const r = arena.splice(y, 1)[0].fill(0);
-        arena.unshift(r);
-        ++y;
-
-        player.score += cnt * 10;
-        cnt *= 2;
-    }
-}
 
 
 const color = [
@@ -125,37 +91,9 @@ const color = [
     '#5EFF4D',
     '#FFA315',
 ] 
-  
-function rotate(m, d) {
-    for (let y = 0; y < m.length; ++y) {
-        for (let x = 0; x < y; ++x) {
-            [
-                m[x][y],
-                m[y][x],
-            ] = [
-                m[y][x],
-                m[x][y],
-            ];
-        }
-    }
-    if (d > 0) {
-        m.forEach(r => r.reverse());
-    } else {
-        m.reverse();
-    }
-}
 
 //the merge function.
 
-function merge(arena, player) {
-    player.matrix.forEach((r, y) => {
-        r.forEach((v, x) => {
-             if (v !== 0) {
-                 arena[y + player.pos.y][x + player.pos.x] = v;
-             }
-        });
-    });
-}
 
 //this update the frames of draw.
 
@@ -177,7 +115,7 @@ function updateScore() {
     document.getElementById('score').innerText = player.score;
 }
 
-const arena = createMatrix(12, 20);
+const arena = new Arena(12, 20);
 
 
 document.addEventListener('keydown', event => {
