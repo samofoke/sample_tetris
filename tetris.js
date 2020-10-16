@@ -126,7 +126,7 @@ const color = [
     '#FE7E63',
     '#FEE963',
     '#63FECD',
-    '#FEBE63',
+    '#a032a8',
     '#5EFF4D',
     '#FFA315',
 ] 
